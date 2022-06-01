@@ -15,15 +15,15 @@ namespace Noob_Agario
             return instance;
         }
 
-        public Player CreatePlayer()
+        public Player CreatePlayer(RenderWindow window)
         {
-            Player player = new Player();
+            Player player = new Player(window);
             return player;
         }
 
-        public Food CreateFood()
+        public Food CreateFood(RenderWindow window)
         {
-            Food food = new Food();
+            Food food = new Food(window);
             return food;
         }
     }

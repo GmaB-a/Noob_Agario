@@ -19,7 +19,7 @@ namespace Noob_Agario
             _window = window;
 
             Radius = starterRadius;
-            Position = new Vector2f(rnd.Next(0, (int)window.Size.X - starterRadius * 2), rnd.Next(0, (int)window.Size.Y - starterRadius * 2));
+            Position = new Vector2f(rnd.Next(0, (int)_window.Size.X - starterRadius * 2), rnd.Next(0, (int)_window.Size.Y - starterRadius * 2));
             byte r = (byte)rnd.Next(1, 255);
             byte g = (byte)rnd.Next(1, 255);
             byte b = (byte)rnd.Next(1, 255);
@@ -30,6 +30,7 @@ namespace Noob_Agario
             name.Position = new Vector2f(Position.X + Radius * 0.7f, Position.Y + Radius * 0.7f);
         }
 
+        private Vector2f PositionToGo = new Vector2f(0,0);
         public void GetInput(Random rnd)
         {
             if (!isBot)
@@ -42,7 +43,22 @@ namespace Noob_Agario
             else
             {
                 CheckIfCanMove(rnd.Next(-1, 2), rnd.Next(-1, 2));
+                /*if (PositionToGo == null || PositionToGo == Position)
+                {
+                    PositionToGo = new Vector2f(rnd.Next(0, (int)_window.Size.X - starterRadius * 2), rnd.Next(0, (int)_window.Size.Y - starterRadius * 2));
+                    Vector2f path = PositionToGo - Position;
+                    Vector2f normalizedPath = normalize(path);
+                    Move(normalizedPath.X, normalizedPath.Y);
+                } */
             }
+        }
+
+        private Vector2f normalize(Vector2f vector)
+        {
+            float length = (float)Math.Sqrt((vector.X * vector.X) + (vector.Y * vector.Y));
+            if (length != 0)
+                return new Vector2f(vector.Y / length, vector.Y / length);
+            return vector;
         }
 
         private void CheckIfCanMove(int dx, int dy)
@@ -55,7 +71,7 @@ namespace Noob_Agario
             Move(dx, dy);
         }
 
-        private void Move(int dx, int dy)
+        private void Move(float dx, float dy)
         {
             Vector2f newPosition = new Vector2f(Position.X + dx * speed, Position.Y + dy * speed);
             Position = newPosition;

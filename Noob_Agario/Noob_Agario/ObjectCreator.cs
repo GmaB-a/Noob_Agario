@@ -15,10 +15,16 @@ namespace Noob_Agario
             return instance;
         }
 
-        public Player CreateObject()
+        public Player CreatePlayer()
         {
             Player player = new Player();
             return player;
+        }
+
+        public Food CreateFood()
+        {
+            Food food = new Food();
+            return food;
         }
     }
 }

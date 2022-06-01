@@ -1,12 +1,16 @@
-﻿namespace Noob_Agario
+﻿using SFML.Window;
+using SFML.Graphics;
+using SFML.System;
+namespace Noob_Agario
 {
     internal class Player
     {
-        float starterRadius = 5;
-        float currentRadius;
+        public CircleShape playerCircle;
+        private float starterRadius = 10;
+        private float currentRadius;
         public Player()
         {
-
+            playerCircle = new CircleShape();
         }
     }
 }

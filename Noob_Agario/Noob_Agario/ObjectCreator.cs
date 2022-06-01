@@ -16,9 +16,9 @@ namespace Noob_Agario
         }
 
         private Random rnd = new Random();
-        public Player CreatePlayer(RenderWindow window, string name)
+        public Player CreatePlayer(RenderWindow window, string name, bool isBot)
         {
-            Player player = new Player(window, rnd, name);
+            Player player = new Player(window, rnd, name, isBot);
             return player;
         }
 
@@ -28,10 +28,10 @@ namespace Noob_Agario
             return food;
         }
 
-        public Text CreateText(RenderWindow window, string text)
+        public Text CreateText(RenderWindow window, string text, uint size)
         {
-            Text newText = new Text();
-            newText.DisplayedString = text;
+            Font font = new Font("font/arial.ttf");
+            Text newText = new Text(text, font, size);
             return newText;
         }
     }

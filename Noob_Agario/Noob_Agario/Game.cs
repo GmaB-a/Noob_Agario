@@ -38,7 +38,7 @@ namespace Noob_Agario
 
             currentPlayerCount = maxPlayers;
             
-            while (window.IsOpen || currentPlayerCount != 1)
+            while (window.IsOpen /*|| currentPlayerCount != 1*/)
             {
                 window.DispatchEvents();
                 window.Clear();

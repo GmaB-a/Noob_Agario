@@ -11,29 +11,22 @@ namespace Noob_Agario
 {
     internal class Game
     {
+        public RenderWindow window;
+
         private static int maxPlayers = 10;
-        private static int maxFood = 20;
-        Shape[] players = new Shape[maxPlayers];
-        Shape[] foods = new Shape[maxFood];
-        Shape[] toDraw = new Shape[maxPlayers + maxFood];
+        private static int maxFood = 25;
+
+        private Shape[] players = new Shape[maxPlayers];
+        private Shape[] foods = new Shape[maxFood];
+        private Shape[] toDraw = new Shape[maxPlayers + maxFood];
         public void Play()
         {
-            RenderWindow window = new RenderWindow(new VideoMode(1600, 900), "Game window");
+            window = new RenderWindow(new VideoMode(1600, 900), "Game window");
+            window.SetFramerateLimit(60);
             window.Closed += WindowClosed;
 
-            for (int i = 0; i < maxPlayers; i++)
-            {
-                Player newPlayer = ObjectCreator.getInstance().CreatePlayer(window);
-                players[i] = newPlayer;
-            }
-            players.CopyTo(toDraw, 0);
-
-            for (int i = 0; i < maxFood; i++)
-            {
-                Food newFood = ObjectCreator.getInstance().CreateFood(window);
-                foods[i] = newFood;
-            }
-            foods.CopyTo(toDraw, players.Length);
+            CreatePlayers();
+            CreateFood();
             
             while (window.IsOpen)
             {
@@ -47,7 +40,27 @@ namespace Noob_Agario
                 window.Display();
             }
         }
-        void WindowClosed(object sender, EventArgs e)
+
+        private void CreatePlayers()
+        {
+            players[0] = ObjectCreator.getInstance().CreatePlayer(window, "you");
+            for (int i = 1; i < maxPlayers; i++)
+            {
+                players[i] = ObjectCreator.getInstance().CreatePlayer(window, "bot");
+            }
+            players.CopyTo(toDraw, 0);
+        }
+
+        private void CreateFood()
+        {
+            for (int i = 0; i < maxFood; i++)
+            {
+                foods[i] = ObjectCreator.getInstance().CreateFood(window);
+            }
+            foods.CopyTo(toDraw, players.Length);
+        }
+
+        private void WindowClosed(object sender, EventArgs e)
         {
             RenderWindow w = (RenderWindow)sender;
             w.Close();

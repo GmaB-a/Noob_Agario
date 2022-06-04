@@ -19,14 +19,11 @@ namespace Noob_Agario
             _window = window;
 
             Radius = starterRadius;
-            Position = new Vector2f(rnd.Next(0, (int)_window.Size.X - starterRadius * 2), rnd.Next(0, (int)_window.Size.Y - starterRadius * 2));
-            byte r = (byte)rnd.Next(1, 255);
-            byte g = (byte)rnd.Next(1, 255);
-            byte b = (byte)rnd.Next(1, 255);
-            FillColor = new Color(r, g, b);
+            Position = ObjectCreator.getInstance().GeneratePosition(Radius);
+            FillColor = ObjectCreator.getInstance().GenerateColor();
             isBot = isABot;
 
-            name = ObjectCreator.getInstance().CreateText(window, playerName, (uint)(Radius * 0.5f));
+            name = ObjectCreator.getInstance().CreateText(playerName, (uint)(Radius * 0.5f));
             name.Position = new Vector2f(Position.X + Radius * 0.7f, Position.Y + Radius * 0.7f);
         }
 
@@ -35,21 +32,21 @@ namespace Noob_Agario
         {
             if (!isBot)
             {
-                if (Keyboard.IsKeyPressed(Keyboard.Key.W)) CheckIfCanMove(0, -1);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.S)) CheckIfCanMove(0, 1);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.A)) CheckIfCanMove(-1, 0);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.D)) CheckIfCanMove(1, 0);
+                if (Keyboard.IsKeyPressed(Keyboard.Key.W)) CheckIfCanMove(new Vector2f(0, -1));
+                if (Keyboard.IsKeyPressed(Keyboard.Key.S)) CheckIfCanMove(new Vector2f(0, 1));
+                if (Keyboard.IsKeyPressed(Keyboard.Key.A)) CheckIfCanMove(new Vector2f(-1, 0));
+                if (Keyboard.IsKeyPressed(Keyboard.Key.D)) CheckIfCanMove(new Vector2f(1, 0));
             }
             else
             {
-                CheckIfCanMove(rnd.Next(-1, 2), rnd.Next(-1, 2));
-                /*if (PositionToGo == null || PositionToGo == Position)
+                //CheckIfCanMove(rnd.Next(-1, 2), rnd.Next(-1, 2));
+                if (PositionToGo != null && PositionToGo != Position)
                 {
-                    PositionToGo = new Vector2f(rnd.Next(0, (int)_window.Size.X - starterRadius * 2), rnd.Next(0, (int)_window.Size.Y - starterRadius * 2));
+                    PositionToGo = ObjectCreator.getInstance().GeneratePosition(Radius);
                     Vector2f path = PositionToGo - Position;
                     Vector2f normalizedPath = normalize(path);
-                    Move(normalizedPath.X, normalizedPath.Y);
-                } */
+                    Move(normalizedPath);
+                }
             }
         }
 
@@ -61,32 +58,32 @@ namespace Noob_Agario
             return vector;
         }
 
-        private void CheckIfCanMove(int dx, int dy)
+        private void CheckIfCanMove(Vector2f path)
         {
-            if ((Position.X - speed < 0) && dx < 0) return;
-            if ((Position.X + Radius * 2 + speed > _window.Size.X) && dx > 0) return;
+            if ((Position.X - speed < 0) && path.X < 0) return;
+            if ((Position.X + Radius * 2 + speed > _window.Size.X) && path.X > 0) return;
 
-            if ((Position.Y - speed < 0) && dy < 0) return;
-            if ((Position.Y + Radius * 2 + speed > _window.Size.Y) && dy > 0) return;
-            Move(dx, dy);
+            if ((Position.Y - speed < 0) && path.Y < 0) return;
+            if ((Position.Y + Radius * 2 + speed > _window.Size.Y) && path.Y > 0) return;
+            Move(path);
         }
 
-        private void Move(float dx, float dy)
+        private void Move(Vector2f path)
         {
-            Vector2f newPosition = new Vector2f(Position.X + dx * speed, Position.Y + dy * speed);
+            Vector2f newPosition = new Vector2f(Position.X + path.X * speed, Position.Y + path.Y * speed);
             Position = newPosition;
             name.Position = new Vector2f(Position.X + Radius * 0.7f, Position.Y + Radius * 0.7f);
         }
 
         public int TryEatPlayer(Player[] players, int currentPlayerCount)
         {
-            for(int i = 0; i < players.Length; i++)
+            foreach (Player player in players)
             {
-                if(players[i] != this && this.GetGlobalBounds().Intersects(players[i].GetGlobalBounds()) && Radius > players[i].Radius)
+                if(player != this && this.GetGlobalBounds().Intersects(player.GetGlobalBounds()) && Radius > player.Radius)
                 {
-                    Radius += players[i].Radius / 2;
-                    players[i].Radius = 0;
-                    players[i].name.DisplayedString = "";
+                    Radius += player.Radius / 2;
+                    player.Radius = 0;
+                    player.name.DisplayedString = "";
                     currentPlayerCount--;
                 }
             }
@@ -95,12 +92,12 @@ namespace Noob_Agario
 
         public void TryEatFood(Food[] foods, RenderWindow window, Random rnd)
         {
-            for (int i = 0; i < foods.Length; i++)
+            foreach (Food food in foods)
             {
-                if (this.GetGlobalBounds().Intersects(foods[i].GetGlobalBounds()))
+                if (this.GetGlobalBounds().Intersects(food.GetGlobalBounds()))
                 {
                     Radius += 2;
-                    foods[i].Position = foods[i].RandomizePosition(window, rnd);
+                    food.Position = ObjectCreator.getInstance().GeneratePosition(food.Radius);
                 }
             }
         }

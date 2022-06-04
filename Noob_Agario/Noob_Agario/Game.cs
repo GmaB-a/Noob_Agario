@@ -16,7 +16,7 @@ namespace Noob_Agario
         private static int maxPlayers = 10;
         private static int maxFood = 25;
 
-        private int currentPlayerCount;
+        private int currentPlayerCount = maxPlayers;
 
         private Player[] players = new Player[maxPlayers];
         private Food[] foods = new Food[maxFood];
@@ -32,13 +32,13 @@ namespace Noob_Agario
             window.Closed += WindowClosed;
             window.SetFramerateLimit(60);
 
+            ObjectCreator.getInstance().GetWindow(window);
+
             CreatePlayers();
             CreateTexts();
             CreateFood();
-
-            currentPlayerCount = maxPlayers;
             
-            while (window.IsOpen /*|| currentPlayerCount != 1*/)
+            while (window.IsOpen || currentPlayerCount != 1)
             {
                 window.DispatchEvents();
                 window.Clear();
@@ -52,10 +52,10 @@ namespace Noob_Agario
 
         private void CreatePlayers()
         {
-            players[0] = ObjectCreator.getInstance().CreatePlayer(window, "you", false);
+            players[0] = ObjectCreator.getInstance().CreatePlayer("you", false);
             for (int i = 1; i < players.Length; i++)
             {
-                players[i] = ObjectCreator.getInstance().CreatePlayer(window, "bot", true);
+                players[i] = ObjectCreator.getInstance().CreatePlayer("bot", true);
             }
             players.CopyTo(toDraw, 0);
         }
@@ -72,7 +72,7 @@ namespace Noob_Agario
         {
             for (int i = 0; i < maxFood; i++)
             {
-                foods[i] = ObjectCreator.getInstance().CreateFood(window);
+                foods[i] = ObjectCreator.getInstance().CreateFood();
             }
             foods.CopyTo(toDraw, players.Length);
         }
@@ -93,11 +93,11 @@ namespace Noob_Agario
 
         private void PlayersLogic()
         {
-            for(int i = 0; i < players.Length; i++)
+            foreach(Player player in players)
             {
-                players[i].GetInput(rnd);
-                currentPlayerCount = players[i].TryEatPlayer(players, currentPlayerCount);
-                players[i].TryEatFood(foods, window, rnd);
+                player.GetInput(rnd);
+                currentPlayerCount = player.TryEatPlayer(players, currentPlayerCount);
+                player.TryEatFood(foods, window, rnd);
             }
         }
 

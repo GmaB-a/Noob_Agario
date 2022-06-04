@@ -10,16 +10,8 @@ namespace Noob_Agario
         public Food(RenderWindow window, Random rnd)
         {
             Radius = radius;
-            Position = RandomizePosition(window, rnd);
-            byte r = (byte)rnd.Next(1, 255);
-            byte g = (byte)rnd.Next(1, 255);
-            byte b = (byte)rnd.Next(1, 255);
-            FillColor = new Color(r, g, b);
-        }
-
-        public Vector2f RandomizePosition(RenderWindow window, Random rnd)
-        {
-            return new Vector2f(rnd.Next(0, (int)window.Size.X - radius * 2), rnd.Next(0, (int)window.Size.Y - radius * 2));
+            Position = ObjectCreator.getInstance().GeneratePosition(Radius);
+            FillColor = ObjectCreator.getInstance().GenerateColor();
         }
     }
 }

@@ -28,6 +28,7 @@ namespace Noob_Agario
         }
 
         private Vector2f PositionToGo = new Vector2f(0,0);
+        Random rnd = new Random();
         public void GetInput(Random rnd)
         {
             if (!isBot)
@@ -40,13 +41,13 @@ namespace Noob_Agario
             else
             {
                 //CheckIfCanMove(rnd.Next(-1, 2), rnd.Next(-1, 2));
-                if (PositionToGo != null && PositionToGo != Position)
+                if (PositionToGo == new Vector2f(0, 0) || PositionToGo == Position)
                 {
                     PositionToGo = ObjectCreator.getInstance().GeneratePosition(Radius);
-                    Vector2f path = PositionToGo - Position;
-                    Vector2f normalizedPath = normalize(path);
-                    Move(normalizedPath);
                 }
+                Vector2f path = PositionToGo - Position;
+                Vector2f normalizedPath = normalize(path);
+                Move(normalizedPath);
             }
         }
 
@@ -54,7 +55,7 @@ namespace Noob_Agario
         {
             float length = (float)Math.Sqrt((vector.X * vector.X) + (vector.Y * vector.Y));
             if (length != 0)
-                return new Vector2f(vector.Y / length, vector.Y / length);
+                return new Vector2f(vector.X / length, vector.Y / length);
             return vector;
         }
 

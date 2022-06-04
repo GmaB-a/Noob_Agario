@@ -7,6 +7,7 @@ namespace Noob_Agario
     internal class Food : CircleShape
     {
         int radius = 7;
+        Random rnd = new Random();
         public Food(RenderWindow window, Random rnd)
         {
             Radius = radius;

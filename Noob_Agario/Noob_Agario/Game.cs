@@ -95,7 +95,7 @@ namespace Noob_Agario
         {
             foreach(Player player in players)
             {
-                player.GetInput(rnd);
+                player.GetInput(rnd, players);
                 currentPlayerCount = player.TryEatPlayer(players, currentPlayerCount);
                 player.TryEatFood(foods, window, rnd);
             }

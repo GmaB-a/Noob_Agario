@@ -24,13 +24,13 @@ namespace Noob_Agario
         private Random rnd = new Random();
         public Player CreatePlayer(string name, bool isBot)
         {
-            Player player = new Player(_window, rnd, name, isBot);
+            Player player = new Player(_window, name, isBot);
             return player;
         }
 
         public Food CreateFood()
         {
-            Food food = new Food(_window, rnd);
+            Food food = new Food(_window);
             return food;
         }
 
@@ -57,6 +57,12 @@ namespace Noob_Agario
             byte g = (byte)rnd.Next(1, 255);
             byte b = (byte)rnd.Next(1, 255);
             return new Color(r, g, b);
+        }
+
+        public Controller GenerateController(bool isBot, Player player)
+        {
+            Controller controller = new Controller(isBot, player);
+            return controller;
         }
     }
 }

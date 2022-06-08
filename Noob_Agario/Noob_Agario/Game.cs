@@ -18,7 +18,7 @@ namespace Noob_Agario
 
         private int currentPlayerCount = maxPlayers;
 
-        private Player[] players = new Player[maxPlayers];
+        public Player[] players = new Player[maxPlayers];
         private Food[] foods = new Food[maxFood];
         private Shape[] toDraw = new Shape[maxPlayers + maxFood];
 
@@ -95,9 +95,9 @@ namespace Noob_Agario
         {
             foreach(Player player in players)
             {
-                player.GetInput(rnd, players);
+                player.MoveLogic(players);
                 currentPlayerCount = player.TryEatPlayer(players, currentPlayerCount);
-                player.TryEatFood(foods, window, rnd);
+                player.TryEatFood(foods);
             }
         }
 

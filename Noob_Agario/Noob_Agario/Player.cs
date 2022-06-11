@@ -4,12 +4,15 @@ using SFML.Graphics;
 using SFML.System;
 namespace Noob_Agario
 {
-    public class Player : CircleShape
+    public class Player
     {
         private RenderWindow _window;
 
+        public CircleShape playerModel;
+
         public Text name;
         public bool isAlive;
+        public bool isBot;
 
         private int starterRadius = 30;
         private float speed = 4f;
@@ -20,47 +23,50 @@ namespace Noob_Agario
         {
             _window = window;
 
-            Radius = starterRadius;
-            Position = ObjectCreator.getInstance().GeneratePosition(Radius);
-            FillColor = ObjectCreator.getInstance().GenerateColor();
+            playerModel = ObjectCreator.CreateCircle(starterRadius);
             isAlive = true;
+            isBot = isABot;
 
-            controller = ObjectCreator.getInstance().GenerateController(isABot, this);
+            controller = ObjectCreator.GenerateController(this);
 
-            name = ObjectCreator.getInstance().CreateText(playerName, (uint)(Radius * 0.5f));
-            name.Position = new Vector2f(Position.X + Radius * 0.7f, Position.Y + Radius * 0.7f);
+            name = ObjectCreator.CreateText(playerName, (uint)(playerModel.Radius * 0.5f));
+            name.Position = new Vector2f(playerModel.Position.X + playerModel.Radius * 0.7f, playerModel.Position.Y + playerModel.Radius * 0.7f);
         }
 
-        public void MoveLogic(Player[] players)
+        public void InputLogic(Player[] players)
         {
-            CheckIfCanMove(controller.GetInput(players, Position, Radius));
+            (Vector2f movePosition, bool wantToChangeControllers) = controller.GetInput(playerModel.Position, playerModel.Radius);
+            CheckIfCanMove(movePosition);
+            if (wantToChangeControllers) ChangeControllersWithBot(players);
         }
 
         private void CheckIfCanMove(Vector2f path)
         {
-            if ((Position.X - speed < 0) && path.X < 0) return;
-            if ((Position.X + Radius * 2 + speed > _window.Size.X) && path.X > 0) return;
+            if ((playerModel.Position.X - speed < 0) && path.X < 0) return;
+            if ((playerModel.Position.X + playerModel.Radius * 2 + speed > _window.Size.X) && path.X > 0) return;
 
-            if ((Position.Y - speed < 0) && path.Y < 0) return;
-            if ((Position.Y + Radius * 2 + speed > _window.Size.Y) && path.Y > 0) return;
+            if ((playerModel.Position.Y - speed < 0) && path.Y < 0) return;
+            if ((playerModel.Position.Y + playerModel.Radius * 2 + speed > _window.Size.Y) && path.Y > 0) return;
             Move(path);
         }
 
         private void Move(Vector2f path)
         {
-            Vector2f newPosition = new Vector2f(Position.X + path.X * speed, Position.Y + path.Y * speed);
-            Position = newPosition;
-            name.Position = new Vector2f(Position.X + Radius * 0.7f, Position.Y + Radius * 0.7f);
+            Vector2f newPosition = playerModel.Position + path * speed;
+            playerModel.Position = newPosition;
+            name.Position = playerModel.Position + new Vector2f(playerModel.Radius * 0.7f, playerModel.Radius * 0.7f);
         }
 
         public int TryEatPlayer(Player[] players, int currentPlayerCount)
         {
             foreach (Player player in players)
             {
-                if(player != this && this.GetGlobalBounds().Intersects(player.GetGlobalBounds()) && Radius > player.Radius)
+                if(player != this && 
+                    playerModel.GetGlobalBounds().Intersects(player.playerModel.GetGlobalBounds()) && 
+                    playerModel.Radius > player.playerModel.Radius)
                 {
-                    Radius += player.Radius / 2;
-                    player.Radius = 0;
+                    playerModel.Radius += player.playerModel.Radius / 2;
+                    player.playerModel.Radius = 0;
                     player.name.DisplayedString = "";
                     currentPlayerCount--;
                     player.isAlive = false;
@@ -73,12 +79,29 @@ namespace Noob_Agario
         {
             foreach (Food food in foods)
             {
-                if (this.GetGlobalBounds().Intersects(food.GetGlobalBounds()))
+                if (playerModel.GetGlobalBounds().Intersects(food.GetGlobalBounds()))
                 {
-                    Radius += 2;
-                    food.Position = ObjectCreator.getInstance().GeneratePosition(food.Radius);
+                    playerModel.Radius += 2;
+                    food.Position = ObjectCreator.GeneratePosition(food.Radius);
                 }
             }
+        }
+
+        private void ChangeControllersWithBot(Player[] players)
+        {
+            Player closestBot = null;
+            float closestLength = float.MaxValue;
+            foreach (Player player in players)
+            {
+                float length = 0;
+                length.CalculateDistance(player.playerModel.Position, playerModel.Position);
+                if (length < closestLength && player != this && player.isAlive)
+                {
+                    closestBot = player;
+                    closestLength = length;
+                }
+            }
+            (closestBot.controller, controller) = (controller, closestBot.controller);
         }
     }
 }

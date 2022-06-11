@@ -11,8 +11,8 @@ namespace Noob_Agario
         public Food(RenderWindow window)
         {
             Radius = radius;
-            Position = ObjectCreator.getInstance().GeneratePosition(Radius);
-            FillColor = ObjectCreator.getInstance().GenerateColor();
+            Position = ObjectCreator.GeneratePosition(Radius);
+            FillColor = ObjectCreator.GenerateColor();
         }
     }
 }

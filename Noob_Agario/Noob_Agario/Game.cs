@@ -32,7 +32,7 @@ namespace Noob_Agario
             window.Closed += WindowClosed;
             window.SetFramerateLimit(60);
 
-            ObjectCreator.getInstance().GetWindow(window);
+            ObjectCreator.GetWindow(window);
 
             CreatePlayers();
             CreateTexts();
@@ -52,12 +52,13 @@ namespace Noob_Agario
 
         private void CreatePlayers()
         {
-            players[0] = ObjectCreator.getInstance().CreatePlayer("you", false);
+            players[0] = ObjectCreator.CreatePlayer("you", false);
+            toDraw[0] = players[0].playerModel;
             for (int i = 1; i < players.Length; i++)
             {
-                players[i] = ObjectCreator.getInstance().CreatePlayer("bot", true);
+                players[i] = ObjectCreator.CreatePlayer("bot", true);
+                toDraw[i] = players[i].playerModel;
             }
-            players.CopyTo(toDraw, 0);
         }
 
         private void CreateTexts()
@@ -72,7 +73,7 @@ namespace Noob_Agario
         {
             for (int i = 0; i < maxFood; i++)
             {
-                foods[i] = ObjectCreator.getInstance().CreateFood();
+                foods[i] = ObjectCreator.CreateFood();
             }
             foods.CopyTo(toDraw, players.Length);
         }
@@ -95,7 +96,7 @@ namespace Noob_Agario
         {
             foreach(Player player in players)
             {
-                player.MoveLogic(players);
+                player.InputLogic(players);
                 currentPlayerCount = player.TryEatPlayer(players, currentPlayerCount);
                 player.TryEatFood(foods);
             }

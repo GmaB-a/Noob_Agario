@@ -15,15 +15,14 @@ namespace Noob_Agario
         }
 
         private Vector2f positionToGo = new Vector2f(0, 0);
-        public (Vector2f, bool) GetInput(Vector2f position, float radius)
+        public Vector2f GetInput()
         {
             if (!currentOwner.isBot)
             {
-                if (Keyboard.IsKeyPressed(Keyboard.Key.W)) return (new Vector2f(0, -1), false);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.S)) return (new Vector2f(0, 1), false);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.A)) return (new Vector2f(-1, 0), false);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.D)) return (new Vector2f(1, 0), false);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.R)) return (new Vector2f(0, 0), true);
+                if (Keyboard.IsKeyPressed(Keyboard.Key.W)) return new Vector2f(0, -1);
+                if (Keyboard.IsKeyPressed(Keyboard.Key.S)) return new Vector2f(0, 1);
+                if (Keyboard.IsKeyPressed(Keyboard.Key.A)) return new Vector2f(-1, 0);
+                if (Keyboard.IsKeyPressed(Keyboard.Key.D)) return new Vector2f(1, 0);
                 /*if (Mouse.IsButtonPressed(Mouse.Button.Left))
                 {
                     PositionToGo = (Vector2f)Mouse.GetPosition();
@@ -36,15 +35,19 @@ namespace Noob_Agario
             }
             else
             {
-                if (positionToGo == new Vector2f(0, 0) || (positionToGo.X - position.X <= 5 && positionToGo.Y - position.Y <= 5))
+                if (positionToGo == new Vector2f(0, 0) || 
+                    (positionToGo.X - currentOwner.Position().X <= 5 && positionToGo.Y - currentOwner.Position().Y <= 5))
                 {
-                    positionToGo = ObjectCreator.GeneratePosition(radius);
+                    positionToGo = ObjectCreator.GeneratePosition(currentOwner.Radius());
                 }
-                Vector2f path = positionToGo - position;
+                Vector2f path = positionToGo - currentOwner.Position();
                 Vector2f normalizedPath = path.Normalize();
-                return (normalizedPath, false);
+                return normalizedPath;
             }
-            return (new Vector2f(0,0), false);
+            return new Vector2f(0,0);
         }
+
+        public bool WantsToChangeControllers()
+            => Keyboard.IsKeyPressed(Keyboard.Key.R);
     }
 }

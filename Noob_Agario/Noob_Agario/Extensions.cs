@@ -24,5 +24,8 @@ namespace Noob_Agario
             float distance = (float)Math.Sqrt(x * x + y * y);
             return distance;
         }
+
+        public static bool Intersects(this Shape model1, Shape model2)
+            => model1.GetGlobalBounds().Intersects(model2.GetGlobalBounds());
     }
 }

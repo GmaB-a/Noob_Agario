@@ -10,6 +10,12 @@ namespace Noob_Agario
 
         public CircleShape playerModel;
 
+        public Vector2f Position()
+            => playerModel.Position;
+
+        public float Radius()
+            => playerModel.Radius;
+
         public Text name;
         public bool isAlive;
         public bool isBot;
@@ -35,9 +41,10 @@ namespace Noob_Agario
 
         public void InputLogic(Player[] players)
         {
-            (Vector2f movePosition, bool wantToChangeControllers) = controller.GetInput(playerModel.Position, playerModel.Radius);
+            Vector2f movePosition = controller.GetInput();
             CheckIfCanMove(movePosition);
-            if (wantToChangeControllers) ChangeControllersWithBot(players);
+
+            if (controller.WantsToChangeControllers()) ChangeControllersWithBot(players);
         }
 
         private void CheckIfCanMove(Vector2f path)
@@ -57,32 +64,35 @@ namespace Noob_Agario
             name.Position = playerModel.Position + new Vector2f(playerModel.Radius * 0.7f, playerModel.Radius * 0.7f);
         }
 
-        public int TryEatPlayer(Player[] players, int currentPlayerCount)
+        public bool CheckIfCanEatPlayer(Player[] players)
         {
             foreach (Player player in players)
             {
-                if(player != this && 
-                    playerModel.GetGlobalBounds().Intersects(player.playerModel.GetGlobalBounds()) && 
-                    playerModel.Radius > player.playerModel.Radius)
+                if(player != this && playerModel.Intersects(player.playerModel) && Radius() > player.Radius())
                 {
                     playerModel.Radius += player.playerModel.Radius / 2;
-                    player.playerModel.Radius = 0;
-                    player.name.DisplayedString = "";
-                    currentPlayerCount--;
-                    player.isAlive = false;
+                    player.Die();
+                    return true;
                 }
             }
-            return currentPlayerCount;
+            return false;
+        }
+
+        private void Die()
+        {
+            playerModel.Radius = 0;
+            name.DisplayedString = "";
+            isAlive = false;
         }
 
         public void TryEatFood(Food[] foods)
         {
             foreach (Food food in foods)
             {
-                if (playerModel.GetGlobalBounds().Intersects(food.GetGlobalBounds()))
+                if (playerModel.Intersects(food.foodModel))
                 {
                     playerModel.Radius += 2;
-                    food.Position = ObjectCreator.GeneratePosition(food.Radius);
+                    food.Relocate();
                 }
             }
         }

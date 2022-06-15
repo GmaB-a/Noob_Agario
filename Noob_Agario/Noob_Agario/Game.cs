@@ -97,7 +97,7 @@ namespace Noob_Agario
             foreach(Player player in players)
             {
                 player.InputLogic(players);
-                currentPlayerCount = player.TryEatPlayer(players, currentPlayerCount);
+                if (player.CheckIfCanEatPlayer(players)) currentPlayerCount--;
                 player.TryEatFood(foods);
             }
         }

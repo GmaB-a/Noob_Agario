@@ -4,15 +4,25 @@ using SFML.Graphics;
 using SFML.System;
 namespace Noob_Agario
 {
-    public  class Food : CircleShape
+    public  class Food
     {
-        int radius = 7;
         Random rnd = new Random();
+
+        public CircleShape foodModel;
+        public Vector2f Position()
+            => foodModel.Position;
+
+        public float Radius()
+            => foodModel.Radius;
+
+        public void Relocate()
+        {
+            foodModel.Position = ObjectCreator.GeneratePosition(Radius());
+        }
+
         public Food(RenderWindow window)
         {
-            Radius = radius;
-            Position = ObjectCreator.GeneratePosition(Radius);
-            FillColor = ObjectCreator.GenerateColor();
+            foodModel = ObjectCreator.CreateCircle(7);
         }
     }
 }

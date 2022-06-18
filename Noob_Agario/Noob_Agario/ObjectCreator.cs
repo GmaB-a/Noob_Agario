@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using SFML.Window;
 using SFML.Graphics;
 using SFML.System;
@@ -18,6 +22,12 @@ namespace Noob_Agario
         {
             Player player = new Player(_window, name, isBot);
             return player;
+        }
+
+        public static Bullet CreateBullet(Player creator, Vector2f moveDirection)
+        {
+            Bullet bullet = new Bullet(creator, moveDirection);
+            return bullet;
         }
 
         public static CircleShape CreateCircle(float radius)

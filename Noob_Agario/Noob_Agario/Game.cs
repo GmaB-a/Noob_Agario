@@ -24,16 +24,17 @@ namespace Noob_Agario
 
         private int currentPlayerCount = maxPlayers;
 
-        public Player[] players = new Player[maxPlayers];
-        private Food[] foods = new Food[maxFood];
-        private Shape[] toDraw = new Shape[maxPlayers + maxFood];
+        public List<Player> players = new List<Player>();
+        private List<Food> foods = new List<Food>();
+        private List<Shape> shapesToDraw = new List<Shape>();
+        private List<Bullet> bullets = new List<Bullet>();
 
-        private Text[] playersNamesTexts = new Text[maxPlayers];
+        private List<Text> playersNamesTexts = new List<Text>();
 
         private Random rnd = new Random();
 
-        int defaultWindowX = 1600;
-        int defaultWindowY = 900;
+        private int defaultWindowX = 1600;
+        private int defaultWindowY = 900;
         public void Play()
         {
             (uint windowX, uint windowY) = GetSavedResolution();
@@ -55,6 +56,7 @@ namespace Noob_Agario
                 window.Clear();
 
                 PlayersLogic();
+                BulletsLogic();
                 DrawObjects();
 
                 window.Display();
@@ -78,18 +80,18 @@ namespace Noob_Agario
         }
         private void CreatePlayers()
         {
-            players[0] = ObjectCreator.CreatePlayer("you", false);
-            toDraw[0] = players[0].playerModel;
-            for (int i = 1; i < players.Length; i++)
+            players.Add(ObjectCreator.CreatePlayer("you", false));
+            shapesToDraw.Add(players[0].playerModel);
+            for (int i = 1; i < maxPlayers; i++)
             {
-                players[i] = ObjectCreator.CreatePlayer("bot", true);
-                toDraw[i] = players[i].playerModel;
+                players.Add(ObjectCreator.CreatePlayer("bot", true));
+                shapesToDraw.Add(players[i].playerModel);
             }
         }
 
         private void CreateTexts()
         {
-            for (int i = 0; i < playersNamesTexts.Length; i++) 
+            for (int i = 0; i < playersNamesTexts.Count; i++) 
             {
                 playersNamesTexts[i] = players[i].name;
             }
@@ -99,23 +101,23 @@ namespace Noob_Agario
         {
             for (int i = 0; i < maxFood; i++)
             {
-                foods[i] = ObjectCreator.CreateFood();
-                toDraw[i + players.Length] = foods[i].foodModel;
+                foods.Add(ObjectCreator.CreateFood());
+                shapesToDraw.Add(foods[i].foodModel);
             }
         }
 
         private void DrawObjects()
         {
-            for (int i = 0; i < maxPlayers; i++)
+            foreach (Shape shape in shapesToDraw)
             {
-                window.Draw(toDraw[i]);
-                window.Draw(playersNamesTexts[i]);
+                window.Draw(shape);
             }
 
-            for (int i = maxPlayers; i < toDraw.Length; i++)
+            foreach (Text text in playersNamesTexts)
             {
-                window.Draw(toDraw[i]);
+                window.Draw(text);
             }
+
         }
 
         private void PlayersLogic()
@@ -126,10 +128,24 @@ namespace Noob_Agario
             }
         }
 
+        private void BulletsLogic()
+        {
+            foreach (Bullet bullet in bullets)
+            {
+                bullet.Update(players);
+            }
+        }
+
         public void OnPlayerEaten()
         {
             currentPlayerCount--;
         }
+
+        public void OnPlayerShoot(Bullet bullet)
+        {
+            bullets.Add(bullet);
+        }
+
         private void WindowClosed(object sender, EventArgs e)
         {
             RenderWindow w = (RenderWindow)sender;

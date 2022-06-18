@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using SFML.Window;
 using SFML.Graphics;
 using SFML.System;
@@ -45,15 +49,25 @@ namespace Noob_Agario
             name.Position = new Vector2f(position.X + radius * 0.7f, position.Y + radius * 0.7f);
         }
 
-        public void InputLogic(Player[] players)
+        public void InputLogic(List<Player> players)
         {
-            Vector2f movePosition = controller.GetMovementDirection();
-            CheckIfCanMove(movePosition);
+            Vector2f moveDirection = controller.GetMovementDirection();
+            CheckIfCanMove(moveDirection);
 
             if (controller.WantsToChangeControllers()) ChangeControllersWithBot(players);
+
+            if (controller.WantsToShoot()) Shoot(moveDirection);
         }
 
-        public void TryEatPlayer(Player[] players)
+        private void Shoot(Vector2f moveDirection)
+        {
+            if (moveDirection == new Vector2f(0, 0)) return;
+            Bullet newBullet = ObjectCreator.CreateBullet(this, moveDirection);
+            Game.instance.OnPlayerShoot(newBullet);
+            radius -= 3f;
+        }
+
+        public void TryEatPlayer(List<Player> players)
         {
             foreach (Player player in players)
             {
@@ -65,7 +79,7 @@ namespace Noob_Agario
             }
         }
 
-        public void TryEatFood(Food[] foods)
+        public void TryEatFood(List<Food> foods)
         {
             foreach (Food food in foods)
             {
@@ -77,7 +91,7 @@ namespace Noob_Agario
             }
         }
 
-        public void Update(Player[] players, Food[] foods)
+        public void Update(List<Player> players, List<Food> foods)
         {
             InputLogic(players);
             TryEatPlayer(players);
@@ -107,7 +121,7 @@ namespace Noob_Agario
             Game.instance.OnPlayerEaten();
         }
 
-        private void ChangeControllersWithBot(Player[] players)
+        private void ChangeControllersWithBot(List<Player> players)
         {
             Player closestBot = null;
             float closestLength = float.MaxValue;

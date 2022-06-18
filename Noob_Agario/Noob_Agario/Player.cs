@@ -10,11 +10,17 @@ namespace Noob_Agario
 
         public CircleShape playerModel;
 
-        public Vector2f Position()
-            => playerModel.Position;
+        public Vector2f position
+        {
+            get => playerModel.Position;
+            set => playerModel.Position = value;
+        }
 
-        public float Radius()
-            => playerModel.Radius;
+        public float radius
+        {
+            get => playerModel.Radius;
+            set => playerModel.Radius = value;
+        }
 
         public Text name;
         public bool isAlive;
@@ -33,56 +39,30 @@ namespace Noob_Agario
             isAlive = true;
             isBot = isABot;
 
-            controller = ObjectCreator.GenerateController(this);
+            controller = ObjectCreator.CreateController(this);
 
             name = ObjectCreator.CreateText(playerName, (uint)(playerModel.Radius * 0.5f));
-            name.Position = new Vector2f(playerModel.Position.X + playerModel.Radius * 0.7f, playerModel.Position.Y + playerModel.Radius * 0.7f);
+            name.Position = new Vector2f(position.X + radius * 0.7f, position.Y + radius * 0.7f);
         }
 
         public void InputLogic(Player[] players)
         {
-            Vector2f movePosition = controller.GetInput();
+            Vector2f movePosition = controller.GetMovementDirection();
             CheckIfCanMove(movePosition);
 
             if (controller.WantsToChangeControllers()) ChangeControllersWithBot(players);
         }
 
-        private void CheckIfCanMove(Vector2f path)
-        {
-            if ((playerModel.Position.X - speed < 0) && path.X < 0) return;
-            if ((playerModel.Position.X + playerModel.Radius * 2 + speed > _window.Size.X) && path.X > 0) return;
-
-            if ((playerModel.Position.Y - speed < 0) && path.Y < 0) return;
-            if ((playerModel.Position.Y + playerModel.Radius * 2 + speed > _window.Size.Y) && path.Y > 0) return;
-            Move(path);
-        }
-
-        private void Move(Vector2f path)
-        {
-            Vector2f newPosition = playerModel.Position + path * speed;
-            playerModel.Position = newPosition;
-            name.Position = playerModel.Position + new Vector2f(playerModel.Radius * 0.7f, playerModel.Radius * 0.7f);
-        }
-
-        public bool CheckIfCanEatPlayer(Player[] players)
+        public void TryEatPlayer(Player[] players)
         {
             foreach (Player player in players)
             {
-                if(player != this && playerModel.Intersects(player.playerModel) && Radius() > player.Radius())
+                if (player != this && playerModel.Intersects(player.playerModel) && this.BiggerThan(player))
                 {
-                    playerModel.Radius += player.playerModel.Radius / 2;
+                    radius += player.radius / 2;
                     player.Die();
-                    return true;
                 }
             }
-            return false;
-        }
-
-        private void Die()
-        {
-            playerModel.Radius = 0;
-            name.DisplayedString = "";
-            isAlive = false;
         }
 
         public void TryEatFood(Food[] foods)
@@ -91,10 +71,40 @@ namespace Noob_Agario
             {
                 if (playerModel.Intersects(food.foodModel))
                 {
-                    playerModel.Radius += 2;
+                    radius += 2;
                     food.Relocate();
                 }
             }
+        }
+
+        public void Update(Player[] players, Food[] foods)
+        {
+            InputLogic(players);
+            TryEatPlayer(players);
+            TryEatFood(foods);
+        }
+        private void CheckIfCanMove(Vector2f direction)
+        {
+            if ((position.X - speed < 0) && direction.X < 0) return;
+            if ((position.X + radius * 2 + speed > _window.Size.X) && direction.X > 0) return;
+
+            if ((position.Y - speed < 0) && direction.Y < 0) return;
+            if ((position.Y + radius * 2 + speed > _window.Size.Y) && direction.Y > 0) return;
+            Move(direction);
+        }
+
+        private void Move(Vector2f direction)
+        {
+            position += direction * speed;
+            name.Position = position + new Vector2f(radius * 0.7f, radius * 0.7f);
+        }
+
+        private void Die()
+        {
+            radius = 0;
+            name.DisplayedString = "";
+            isAlive = false;
+            Game.instance.OnPlayerEaten();
         }
 
         private void ChangeControllersWithBot(Player[] players)
@@ -111,7 +121,10 @@ namespace Noob_Agario
                     closestLength = length;
                 }
             }
-            (closestBot.controller, controller) = (controller, closestBot.controller);
+            if (closestBot != null)
+            {
+                (closestBot.controller, controller) = (controller, closestBot.controller);
+            }
         }
     }
 }

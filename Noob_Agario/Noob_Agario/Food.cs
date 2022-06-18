@@ -17,7 +17,7 @@ namespace Noob_Agario
 
         public void Relocate()
         {
-            foodModel.Position = ObjectCreator.GeneratePosition(Radius());
+            foodModel.Position = RandomGenerator.GeneratePosition(Radius());
         }
 
         public Food(RenderWindow window)

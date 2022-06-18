@@ -27,5 +27,8 @@ namespace Noob_Agario
 
         public static bool Intersects(this Shape model1, Shape model2)
             => model1.GetGlobalBounds().Intersects(model2.GetGlobalBounds());
+
+        public static bool BiggerThan(this Player player1, Player player2)
+            => player1.radius > player2.radius;
     }
 }

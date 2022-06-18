@@ -24,8 +24,8 @@ namespace Noob_Agario
         {
             CircleShape circle = new CircleShape();
             circle.Radius = radius;
-            circle.FillColor = GenerateColor();
-            circle.Position = GeneratePosition(radius);
+            circle.FillColor = RandomGenerator.GenerateColor();
+            circle.Position = RandomGenerator.GeneratePosition(radius);
             return circle;
         }
 
@@ -41,26 +41,7 @@ namespace Noob_Agario
             Text newText = new Text(text, font, size);
             return newText;
         }
-
-        public static Vector2f GeneratePosition(float radius)
-        {
-            float x = GenerateRandomNumber(0, _window.Size.X - radius * 2);
-            float y = GenerateRandomNumber(0, _window.Size.Y - radius * 2);
-            return new Vector2f(x,y);
-        }
-
-        public static float GenerateRandomNumber(float min, float max)
-            => rnd.Next((int)min, (int)max);
-
-        public static Color GenerateColor()
-        {
-            byte r = (byte)rnd.Next(1, 255);
-            byte g = (byte)rnd.Next(1, 255);
-            byte b = (byte)rnd.Next(1, 255);
-            return new Color(r, g, b);
-        }
-
-        public static Controller GenerateController(Player player)
+        public static Controller CreateController(Player player)
         {
             Controller controller = new Controller(player);
             return controller;

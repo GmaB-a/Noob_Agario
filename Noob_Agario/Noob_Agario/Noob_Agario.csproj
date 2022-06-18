@@ -66,6 +66,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="RandomGenerator.cs" />
+    <Compile Include="SavingSystem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

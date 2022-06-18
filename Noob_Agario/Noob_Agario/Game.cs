@@ -13,6 +13,12 @@ namespace Noob_Agario
     {
         public RenderWindow window;
 
+        public static Game instance;
+        public Game()
+        {
+            instance = this;
+        }
+
         private static int maxPlayers = 10;
         private static int maxFood = 25;
 
@@ -26,13 +32,18 @@ namespace Noob_Agario
 
         private Random rnd = new Random();
 
+        int defaultWindowX = 1600;
+        int defaultWindowY = 900;
         public void Play()
         {
-            window = new RenderWindow(new VideoMode(1600, 900), "Game window");
+            (uint windowX, uint windowY) = GetSavedResolution();
+            window = new RenderWindow(new VideoMode(windowX, windowY), "Game window");
+
             window.Closed += WindowClosed;
             window.SetFramerateLimit(60);
 
             ObjectCreator.GetWindow(window);
+            RandomGenerator.GetWindow(window);
 
             CreatePlayers();
             CreateTexts();
@@ -50,6 +61,21 @@ namespace Noob_Agario
             }
         }
 
+        private (uint, uint) GetSavedResolution()
+        {
+            var myIni = new SavingSystem("config.ini");
+            if (!myIni.KeyExists("WindowResolutionX", "Window"))
+            {
+                myIni.Write("WindowResolutionX", defaultWindowX.ToString(), "Window");
+            }
+            if (!myIni.KeyExists("WindowResolutionY", "Window"))
+            {
+                myIni.Write("WindowResolutionY", defaultWindowY.ToString(), "Window");
+            }
+            uint windowX = uint.Parse(myIni.Read("WindowResolutionX", "Window"));
+            uint windowY = uint.Parse(myIni.Read("WindowResolutionY", "Window"));
+            return (windowX, windowY);
+        }
         private void CreatePlayers()
         {
             players[0] = ObjectCreator.CreatePlayer("you", false);
@@ -74,8 +100,8 @@ namespace Noob_Agario
             for (int i = 0; i < maxFood; i++)
             {
                 foods[i] = ObjectCreator.CreateFood();
+                toDraw[i + players.Length] = foods[i].foodModel;
             }
-            foods.CopyTo(toDraw, players.Length);
         }
 
         private void DrawObjects()
@@ -96,12 +122,14 @@ namespace Noob_Agario
         {
             foreach(Player player in players)
             {
-                player.InputLogic(players);
-                if (player.CheckIfCanEatPlayer(players)) currentPlayerCount--;
-                player.TryEatFood(foods);
+                player.Update(players, foods);
             }
         }
 
+        public void OnPlayerEaten()
+        {
+            currentPlayerCount--;
+        }
         private void WindowClosed(object sender, EventArgs e)
         {
             RenderWindow w = (RenderWindow)sender;

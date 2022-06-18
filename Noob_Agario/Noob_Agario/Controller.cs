@@ -15,7 +15,7 @@ namespace Noob_Agario
         }
 
         private Vector2f positionToGo = new Vector2f(0, 0);
-        public Vector2f GetInput()
+        public Vector2f GetMovementDirection()
         {
             if (!currentOwner.isBot)
             {
@@ -35,19 +35,23 @@ namespace Noob_Agario
             }
             else
             {
+                Vector2f position = currentOwner.position;
                 if (positionToGo == new Vector2f(0, 0) || 
-                    (positionToGo.X - currentOwner.Position().X <= 5 && positionToGo.Y - currentOwner.Position().Y <= 5))
+                    (positionToGo.X - position.X <= 5 && positionToGo.Y - position.Y <= 5))
                 {
-                    positionToGo = ObjectCreator.GeneratePosition(currentOwner.Radius());
+                    positionToGo = RandomGenerator.GeneratePosition(currentOwner.radius);
                 }
-                Vector2f path = positionToGo - currentOwner.Position();
-                Vector2f normalizedPath = path.Normalize();
-                return normalizedPath;
+                Vector2f direction = positionToGo - position;
+                Vector2f normalizedDirection = direction.Normalize();
+                return normalizedDirection;
             }
             return new Vector2f(0,0);
         }
 
         public bool WantsToChangeControllers()
-            => Keyboard.IsKeyPressed(Keyboard.Key.R);
+            => !currentOwner.isBot && Keyboard.IsKeyPressed(Keyboard.Key.R);
+
+        public bool WantsToShoot()
+            => !currentOwner.isBot && Mouse.IsButtonPressed(Mouse.Button.Left);
     }
 }

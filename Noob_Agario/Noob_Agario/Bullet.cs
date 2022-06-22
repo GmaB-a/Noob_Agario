@@ -12,14 +12,14 @@ namespace Noob_Agario
     {
         private Player owner;
         private Vector2f flyDirection;
-        private CircleShape bulletModel;
+        public CircleShape bulletModel;
         private float speed = 15f;
         public Bullet(Player creator, Vector2f direction)
         {
             owner = creator;
             flyDirection = direction;
-            bulletModel = ObjectCreator.CreateCircle(3);
-            bulletModel.Position = owner.position;
+            bulletModel = ObjectCreator.CreateCircle(7);
+            bulletModel.Position = owner.position + new Vector2f(owner.radius, owner.radius);
         }
         public void Update(List<Player> players)
         {
@@ -28,10 +28,18 @@ namespace Noob_Agario
             {
                 if(bulletModel.Intersects(player.playerModel) && player != owner)
                 {
-                    player.radius -= 10f;
+                    player.Lose(3f);
+                    Destroy();
+                    break;
                 }
             }
         }
 
+        private void Destroy()
+        {
+            bulletModel.Radius = 0;
+            Game.instance.bullets.Remove(this);
+            Game.instance.shapesToDraw.Remove(bulletModel);
+        }
     }
 }

@@ -19,14 +19,16 @@ namespace Noob_Agario
         }
 
         private Vector2f positionToGo = new Vector2f(0, 0);
+        private Vector2f directionToGo = new Vector2f(0, 0);
         public Vector2f GetMovementDirection()
         {
+            directionToGo = new Vector2f(0, 0);
             if (!currentOwner.isBot)
             {
-                if (Keyboard.IsKeyPressed(Keyboard.Key.W)) return new Vector2f(0, -1);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.S)) return new Vector2f(0, 1);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.A)) return new Vector2f(-1, 0);
-                if (Keyboard.IsKeyPressed(Keyboard.Key.D)) return new Vector2f(1, 0);
+                if (Keyboard.IsKeyPressed(Keyboard.Key.W)) directionToGo += new Vector2f(0, -1);
+                if (Keyboard.IsKeyPressed(Keyboard.Key.S)) directionToGo += new Vector2f(0, 1);
+                if (Keyboard.IsKeyPressed(Keyboard.Key.A)) directionToGo += new Vector2f(-1, 0);
+                if (Keyboard.IsKeyPressed(Keyboard.Key.D)) directionToGo += new Vector2f(1, 0);
                 /*if (Mouse.IsButtonPressed(Mouse.Button.Left))
                 {
                     PositionToGo = (Vector2f)Mouse.GetPosition();
@@ -46,10 +48,9 @@ namespace Noob_Agario
                     positionToGo = RandomGenerator.GeneratePosition(currentOwner.radius);
                 }
                 Vector2f direction = positionToGo - position;
-                Vector2f normalizedDirection = direction.Normalize();
-                return normalizedDirection;
+                directionToGo = direction.Normalize();
             }
-            return new Vector2f(0,0);
+            return directionToGo;
         }
 
         public bool WantsToChangeControllers()

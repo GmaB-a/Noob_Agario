@@ -25,11 +25,11 @@ namespace Noob_Agario
         private int currentPlayerCount = maxPlayers;
 
         public List<Player> players = new List<Player>();
-        private List<Food> foods = new List<Food>();
-        private List<Shape> shapesToDraw = new List<Shape>();
-        private List<Bullet> bullets = new List<Bullet>();
+        public List<Bullet> bullets = new List<Bullet>();
+        public List<Food> foods = new List<Food>();
+        public List<Shape> shapesToDraw = new List<Shape>();
 
-        private List<Text> playersNamesTexts = new List<Text>();
+        public List<Text> playersNamesTexts = new List<Text>();
 
         private Random rnd = new Random();
 
@@ -91,9 +91,9 @@ namespace Noob_Agario
 
         private void CreateTexts()
         {
-            for (int i = 0; i < playersNamesTexts.Count; i++) 
+            foreach(Player player in players)
             {
-                playersNamesTexts[i] = players[i].name;
+                playersNamesTexts.Add(player.name);
             }
         }
 
@@ -130,7 +130,7 @@ namespace Noob_Agario
 
         private void BulletsLogic()
         {
-            foreach (Bullet bullet in bullets)
+            foreach (Bullet bullet in bullets.ToArray())
             {
                 bullet.Update(players);
             }
@@ -144,6 +144,7 @@ namespace Noob_Agario
         public void OnPlayerShoot(Bullet bullet)
         {
             bullets.Add(bullet);
+            shapesToDraw.Add(bullet.bulletModel);
         }
 
         private void WindowClosed(object sender, EventArgs e)

@@ -52,19 +52,18 @@ namespace Noob_Agario
         public void InputLogic(List<Player> players)
         {
             Vector2f moveDirection = controller.GetMovementDirection();
-            CheckIfCanMove(moveDirection);
+            if (moveDirection != new Vector2f(0, 0)) CheckIfCanMove(moveDirection);
 
             if (controller.WantsToChangeControllers()) ChangeControllersWithBot(players);
 
-            if (controller.WantsToShoot()) Shoot(moveDirection);
+            if (controller.WantsToShoot()) Shoot(lastMovedDirection);
         }
 
         private void Shoot(Vector2f moveDirection)
         {
-            if (moveDirection == new Vector2f(0, 0)) return;
             Bullet newBullet = ObjectCreator.CreateBullet(this, moveDirection);
             Game.instance.OnPlayerShoot(newBullet);
-            radius -= 3f;
+            Lose(1f);
         }
 
         public void TryEatPlayer(List<Player> players)
@@ -73,7 +72,7 @@ namespace Noob_Agario
             {
                 if (player != this && playerModel.Intersects(player.playerModel) && this.BiggerThan(player))
                 {
-                    radius += player.radius / 2;
+                    Gain(player.radius / 2);
                     player.Die();
                 }
             }
@@ -85,7 +84,7 @@ namespace Noob_Agario
             {
                 if (playerModel.Intersects(food.foodModel))
                 {
-                    radius += 2;
+                    Gain(2f);
                     food.Relocate();
                 }
             }
@@ -93,24 +92,41 @@ namespace Noob_Agario
 
         public void Update(List<Player> players, List<Food> foods)
         {
+            if (!isAlive) return;
             InputLogic(players);
             TryEatPlayer(players);
             TryEatFood(foods);
         }
+
         private void CheckIfCanMove(Vector2f direction)
         {
-            if ((position.X - speed < 0) && direction.X < 0) return;
-            if ((position.X + radius * 2 + speed > _window.Size.X) && direction.X > 0) return;
+            if ((position.X - speed < 0) && direction.X < 0) direction.X = 0;
+            if ((position.X + radius * 2 + speed > _window.Size.X) && direction.X > 0) direction.X = 0;
 
-            if ((position.Y - speed < 0) && direction.Y < 0) return;
-            if ((position.Y + radius * 2 + speed > _window.Size.Y) && direction.Y > 0) return;
+            if ((position.Y - speed < 0) && direction.Y < 0) direction.Y = 0;
+            if ((position.Y + radius * 2 + speed > _window.Size.Y) && direction.Y > 0) direction.Y = 0;
             Move(direction);
         }
+
+        public Vector2f lastMovedDirection = new Vector2f(1,0);
 
         private void Move(Vector2f direction)
         {
             position += direction * speed;
+            lastMovedDirection = direction;
             name.Position = position + new Vector2f(radius * 0.7f, radius * 0.7f);
+        }
+
+        public void Gain(float amount)
+        {
+            radius += amount;
+            if (radius > 350) radius = 350;
+        }
+
+        public void Lose(float amount)
+        {
+            radius -= amount;
+            if (radius <= 0) Die();
         }
 
         private void Die()
